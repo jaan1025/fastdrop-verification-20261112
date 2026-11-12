@@ -19,8 +19,8 @@ jobs:
           package-manager-cache: false
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter claim check-types
       - run: pnpm --filter claim build
         env:
           VITE_FASTDROP_MODE: demo
           VITE_TEST_MODE: 'false'
+      - run: pnpm --filter claim check-types
