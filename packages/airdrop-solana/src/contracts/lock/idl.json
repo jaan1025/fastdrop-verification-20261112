@@ -1,0 +1,894 @@
+{
+  "address": "2sB4WkRwmkwNaidbRPFKzN2ZaV1enyajptupc4cMac4p",
+  "metadata": {
+    "name": "clique_lock",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor",
+    "repository": "https://github.com/CliqueOfficial/clique-lock-svm"
+  },
+  "instructions": [
+    {
+      "name": "claim",
+      "discriminator": [62, 198, 214, 193, 213, 159, 108, 210],
+      "accounts": [
+        {
+          "name": "stream",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "docs": [
+            "The recipient's token account to receive claimed tokens.",
+            "For NFT-bound streams, this is the token account owned by the NFT holder."
+          ],
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "docs": ["The mint of the token being claimed"],
+          "relations": ["stream"]
+        },
+        {
+          "name": "stream_token_account",
+          "docs": ["The stream's token account holding vested tokens (PDA owned by stream)"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stream"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "docs": ["Token program - must come before optional accounts"]
+        },
+        {
+          "name": "nft_binding",
+          "docs": [
+            "Optional: NftBinding account (required for NFT-bound streams)",
+            "Bound to the same stream_id, immutable after initialization"
+          ],
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [78, 102, 116, 66, 105, 110, 100, 105, 110, 103]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft_holder_token_account",
+          "docs": [
+            "Optional: The token account holding the NFT (required for NFT-bound streams)",
+            "This is used to verify NFT ownership and resolve the recipient.",
+            "Note: No token_program constraint since NFT may use a different program than stream tokens."
+          ],
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "stream_id",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_nft_bound_stream",
+      "docs": [
+        "Create an NFT-bound stream where the recipient is determined by NFT ownership",
+        "Both Stream and NftBinding are bound to the same stream_id",
+        "The NftBinding is immutable after initialization",
+        "",
+        "The `stream_id` is a unique 32-byte identifier provided by the caller.",
+        "This eliminates contention on a global counter, enabling concurrent stream creation."
+      ],
+      "discriminator": [181, 129, 2, 233, 50, 56, 167, 3],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stream",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft_binding",
+          "docs": [
+            "NftBinding account - bound to the same stream_id as Stream",
+            "Immutable after initialization"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [78, 102, 116, 66, 105, 110, 100, 105, 110, 103]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft_mint",
+          "docs": [
+            "The NFT mint to bind this stream to",
+            "Validated as NFT mint (supply=1, decimals=0)"
+          ]
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "revoke_authority",
+          "docs": [
+            "The account that will be authorized to revoke this stream.",
+            "Does not need to sign during creation - only when revoking."
+          ]
+        },
+        {
+          "name": "vault_authority",
+          "docs": [
+            "The vault authority that can authorize token transfers from the vault.",
+            "Can be either the vault owner OR a delegate with sufficient allowance."
+          ],
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "The source vault holding tokens to fund the stream.",
+            "vault_authority must be either the owner or a delegate of this account."
+          ],
+          "writable": true
+        },
+        {
+          "name": "stream_token_account",
+          "docs": ["The stream's token account to hold vested tokens (PDA owned by stream)"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stream"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "stream_id",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "cliff_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
+        },
+        {
+          "name": "start_unlock_percentage",
+          "type": "u64"
+        },
+        {
+          "name": "cliff_unlock_percentage",
+          "type": "u64"
+        },
+        {
+          "name": "piece_duration",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_stream",
+      "docs": [
+        "Create a regular stream with a fixed recipient address",
+        "",
+        "The `stream_id` is a unique 32-byte identifier provided by the caller.",
+        "This eliminates contention on a global counter, enabling concurrent stream creation.",
+        "Recommended: use keccak256(creator_pubkey || timestamp || nonce) or random bytes."
+      ],
+      "discriminator": [71, 188, 111, 127, 108, 40, 229, 158],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stream",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "docs": ["The recipient's token account (used to identify the recipient)"]
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "revoke_authority",
+          "docs": [
+            "The account that will be authorized to revoke this stream.",
+            "Does not need to sign during creation - only when revoking."
+          ]
+        },
+        {
+          "name": "vault_authority",
+          "docs": [
+            "The vault authority that can authorize token transfers from the vault.",
+            "Can be either the vault owner OR a delegate with sufficient allowance."
+          ],
+          "signer": true
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "The source vault holding tokens to fund the stream.",
+            "vault_authority must be either the owner or a delegate of this account."
+          ],
+          "writable": true
+        },
+        {
+          "name": "stream_token_account",
+          "docs": ["The stream's token account to hold vested tokens (PDA owned by stream)"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stream"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "stream_id",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "cliff_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
+        },
+        {
+          "name": "start_unlock_percentage",
+          "type": "u64"
+        },
+        {
+          "name": "cliff_unlock_percentage",
+          "type": "u64"
+        },
+        {
+          "name": "piece_duration",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "stream_id",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109, 73, 100]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_revoke_authority",
+      "discriminator": [176, 114, 153, 38, 120, 51, 0, 111],
+      "accounts": [
+        {
+          "name": "stream",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "revoke_authority",
+          "docs": ["The current revoke authority (must sign to remove)"],
+          "signer": true,
+          "relations": ["stream"]
+        }
+      ],
+      "args": [
+        {
+          "name": "stream_id",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    },
+    {
+      "name": "revoke",
+      "discriminator": [170, 23, 31, 34, 133, 173, 93, 242],
+      "accounts": [
+        {
+          "name": "stream",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "revoke_authority",
+          "docs": ["The revoke authority (must sign to revoke)"],
+          "writable": true,
+          "signer": true,
+          "relations": ["stream"]
+        },
+        {
+          "name": "mint",
+          "docs": ["The mint of the token"],
+          "relations": ["stream"]
+        },
+        {
+          "name": "stream_token_account",
+          "docs": ["The stream's token account holding vested tokens (PDA owned by stream)"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "stream"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "revoke_authority_token_account",
+          "docs": ["The revoke authority's token account to receive remaining tokens"],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "revoke_authority"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "nft_binding",
+          "docs": [
+            "Optional: NftBinding account (required for NFT-bound streams)",
+            "Must be provided when revoking an NFT-bound stream to close the binding.",
+            "Rent is returned to the revoke_authority."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [78, 102, 116, 66, 105, 110, 100, 105, 110, 103]
+              },
+              {
+                "kind": "arg",
+                "path": "stream_id"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "stream_id",
+          "type": {
+            "array": ["u8", 32]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "NftBinding",
+      "discriminator": [128, 110, 14, 56, 21, 77, 249, 136]
+    },
+    {
+      "name": "Stream",
+      "discriminator": [166, 224, 59, 4, 202, 10, 186, 83]
+    },
+    {
+      "name": "StreamId",
+      "discriminator": [85, 130, 132, 225, 64, 57, 5, 203]
+    }
+  ],
+  "events": [
+    {
+      "name": "ClaimEvent",
+      "discriminator": [93, 15, 70, 170, 48, 140, 212, 219]
+    },
+    {
+      "name": "CreateStreamEvent",
+      "discriminator": [64, 25, 96, 107, 227, 131, 38, 98]
+    },
+    {
+      "name": "RevokeAuthorityRemovedEvent",
+      "discriminator": [11, 220, 42, 100, 72, 178, 131, 177]
+    },
+    {
+      "name": "RevokeStreamEvent",
+      "discriminator": [44, 242, 210, 130, 93, 37, 148, 168]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidSchedule",
+      "msg": "Invalid schedule parameters"
+    },
+    {
+      "code": 6001,
+      "name": "NothingToClaim",
+      "msg": "Nothing to claim"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidNftOwnership",
+      "msg": "NFT token account does not hold the required NFT"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidNftMint",
+      "msg": "Invalid NFT mint - must have supply of 1 and decimals of 0"
+    },
+    {
+      "code": 6005,
+      "name": "NftHolderAccountRequired",
+      "msg": "NFT-bound stream requires NFT holder token account"
+    },
+    {
+      "code": 6006,
+      "name": "RecipientMismatch",
+      "msg": "Recipient mismatch - provided recipient does not match NFT holder"
+    },
+    {
+      "code": 6007,
+      "name": "NftAccountFrozen",
+      "msg": "NFT account is frozen - claiming is not allowed"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidVaultAuthority",
+      "msg": "Invalid vault authority - must be vault owner or delegate with sufficient allowance"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidUnlockPercentage",
+      "msg": "Invalid unlock percentage - each must be <= 100% and their sum must not exceed 100%"
+    },
+    {
+      "code": 6010,
+      "name": "NftBindingRequired",
+      "msg": "NFT-bound stream revocation requires NftBinding account"
+    }
+  ],
+  "types": [
+    {
+      "name": "ClaimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stream",
+            "type": "pubkey"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateStreamEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stream",
+            "type": "pubkey"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "revoke_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NftBinding",
+      "docs": [
+        "NftBinding represents an NFT bound to a specific stream.",
+        "On Solana, NFTs are SPL tokens with supply=1 and decimals=0.",
+        "Ownership is determined by checking which Token Account holds the NFT.",
+        "",
+        "PDA seeds: [NftBinding::SEED, stream_id]",
+        "This creates a 1:1 relationship between Stream and NftBinding.",
+        "The stream_id binding is guaranteed by PDA derivation - no need to store it.",
+        "Once initialized, the binding is immutable."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nft_mint",
+            "docs": ["The NFT mint address (SPL token with supply=1, decimals=0)"],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "docs": ["Bump seed for PDA derivation"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RevokeAuthorityRemovedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stream",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_authority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RevokeStreamEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stream",
+            "type": "pubkey"
+          },
+          {
+            "name": "revoke_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "remaining_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stream",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "docs": [
+              "The recipient's token account.",
+              "For NFT-bound streams, this is Pubkey::default() and resolved from NftBinding at claim time."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "revoke_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "claimed_amount",
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "cliff_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
+          },
+          {
+            "name": "start_unlock_percentage",
+            "type": "u64"
+          },
+          {
+            "name": "cliff_unlock_percentage",
+            "type": "u64"
+          },
+          {
+            "name": "piece_duration",
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": ["u8", 64]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StreamId",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": ["u8", 32]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

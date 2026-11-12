@@ -1,0 +1,26 @@
+name: Fastdrop check
+on:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter claim check-types
+      - run: pnpm --filter claim build
+        env:
+          VITE_FASTDROP_MODE: demo
+          VITE_TEST_MODE: 'false'

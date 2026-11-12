@@ -1,0 +1,69 @@
+{
+  "name": "@repo/airdrop-app-shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/airdrop-app-shared"
+  },
+  "exports": {
+    "./app": "./src/app/index.ts",
+    "./chain": "./src/chain/index.ts",
+    "./claim/hooks": "./src/claim/hooks/index.ts",
+    "./claim/hooks/distributor-claim-portal-evm": "./src/claim/hooks/use-distributor-claim-portal/use-distributor-claim-portal-evm.ts",
+    "./claim/hooks/distributor-claim-portal-solana": "./src/claim/hooks/use-distributor-claim-portal/use-distributor-claim-portal-solana.ts",
+    "./claim/hooks/lock-claim-portal-evm": "./src/claim/hooks/use-lock-claim-portal/use-lock-claim-portal-evm.ts",
+    "./claim/hooks/lock-claim-portal-solana": "./src/claim/hooks/use-lock-claim-portal/use-lock-claim-portal-solana.ts",
+    "./providers": "./src/providers/index.ts",
+    "./providers/chains": "./src/providers/chains/index.ts",
+    "./providers/chains/evm": "./src/providers/chains/evm.ts",
+    "./providers/chains/solana": "./src/providers/chains/solana.ts",
+    "./providers/data": "./src/providers/data/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./wallet-control": "./src/wallet-control/index.ts",
+    "./lib": "./src/lib/index.ts",
+    "./env": "./src/env/index.ts",
+    "./stream-position": "./src/stream-position/index.ts",
+    "./claim": "./src/claim/index.ts"
+  },
+  "devDependencies": {
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.100.9",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jotai": "^2.19.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.8"
+  },
+  "peerDependencies": {
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.100.9",
+    "jotai": "^2.19.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  },
+  "dependencies": {
+    "@reown/appkit": "^1.8.20",
+    "@repo/acs-client": "workspace:*",
+    "@repo/airdrop-base": "workspace:*",
+    "@repo/airdrop-evm": "workspace:*",
+    "@repo/airdrop-solana": "workspace:*",
+    "@repo/auth": "workspace:*",
+    "@repo/chain-evm-kit": "workspace:*",
+    "@repo/chain-solana-kit": "workspace:*",
+    "@repo/components": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@repo/tos-signer-base": "workspace:*",
+    "@tanstack/react-form": "^1.29.0",
+    "@tanstack/react-router": "^1.168.21",
+    "@web3icons/react": "^4.1.17",
+    "lucide-react": "^1.8.0",
+    "nuqs": "^2.8.9",
+    "viem": "^2.52.0",
+    "wagmi": "^2.19.5",
+    "zod": "^4.3.6"
+  }
+}

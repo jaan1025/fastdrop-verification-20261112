@@ -1,0 +1,168 @@
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Token → Tailwind v4 theme mapping. Defining a `--color-*` here generates the
+ * matching `bg-*` / `text-*` / `border-*` util. Re-themed to template-mono:
+ * mono's shadcn slots + the reg-* registration palette, plus the Signal-era
+ * slots the forked primitives / widgets still reference (re-derived in
+ * tokens.css). Font families follow mono's contract (apps define --font-app-*). */
+@theme inline {
+  /* Surfaces & text */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-subtle: var(--subtle);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-surface-info: var(--surface-info);
+  --color-track: var(--track);
+  --color-progress-track: var(--progress-track);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Brand */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-tint: var(--primary-tint);
+  --color-primary-tint-2: var(--primary-tint-2);
+
+  /* Commit (black) action */
+  --color-commit: var(--commit);
+  --color-commit-foreground: var(--commit-foreground);
+  --color-commit-hover: var(--commit-hover);
+
+  /* Secondary / accent */
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* Positive (mono) */
+  --color-positive: var(--positive);
+  --color-positive-foreground: var(--positive-foreground);
+
+  /* Status — interactive */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-tint: var(--success-tint);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-tint: var(--warning-tint);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-tint: var(--destructive-tint);
+  --color-member: var(--member);
+  --color-member-foreground: var(--member-foreground);
+  --color-member-tint: var(--member-tint);
+
+  /* Status — indicators */
+  --color-danger-alert: var(--danger-alert);
+  --color-success-bright: var(--success-bright);
+
+  /* Disabled */
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
+
+  /* Borders, rings, overlay */
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-token: var(--border-token);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* @airdrop/registration-ui — exposed as Tailwind utilities
+     (e.g. `bg-reg-card-bg`, `text-reg-eligible`, `border-reg-border`). */
+  --color-reg-eligible: var(--reg-eligible);
+  --color-reg-danger: var(--reg-danger);
+  --color-reg-accent: var(--reg-accent);
+  --color-reg-card-bg: var(--reg-card-bg);
+  --color-reg-border: var(--reg-border);
+  --color-reg-divider: var(--reg-divider);
+  --color-reg-muted-foreground: var(--reg-muted-foreground);
+  --color-reg-bg: var(--reg-bg);
+  --color-reg-gradient-start: var(--reg-gradient-start);
+  --color-reg-gradient-mid: var(--reg-gradient-mid);
+  --color-reg-gradient-end: var(--reg-gradient-end);
+
+  /* Radii (mono §3.6 scale) */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 2px);
+
+  /* Elevation */
+  --shadow-card: var(--shadow-card);
+
+  /* Font families — mono contract (apps define --font-app-*). --font-display
+     has no mono equivalent; it falls back to the app sans family. */
+  --font-sans: var(--font-app-sans);
+  --font-mono: var(--font-app-mono);
+  --font-display: var(--font-app-sans);
+}
+
+@theme {
+  --text-3xl: 2rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@utility stack {
+  @apply flex flex-col items-stretch;
+}
+
+@utility comfortable-button {
+  @apply sm:min-w-[184px];
+}
+
+@utility linear-bg {
+  background: linear-gradient(180deg, #6e8df6 0%, #3abfe7 100%);
+}
+
+@utility linear-text {
+  background: linear-gradient(90deg, #6e8df6 3.24%, #3abfe7 101.79%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility linear-border {
+  background:
+    linear-gradient(var(--background), var(--background)) padding-box,
+    linear-gradient(180deg, #6e8df6 0%, #3abfe7 100%) border-box;
+  border: 1px solid transparent;
+}

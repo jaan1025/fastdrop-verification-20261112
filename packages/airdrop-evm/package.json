@@ -1,0 +1,34 @@
+{
+  "name": "@repo/airdrop-evm",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/airdrop-evm"
+  },
+  "exports": {
+    "./contracts": "./src/contracts/index.ts",
+    "./query": "./src/query/index.ts",
+    "./react": "./src/react/index.ts",
+    "./keys": "./src/query/keys.ts"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "viem": "^2",
+    "wagmi": "^2"
+  },
+  "dependencies": {
+    "@repo/acs-client": "workspace:*",
+    "@repo/airdrop-base": "workspace:*",
+    "@repo/chain-evm-kit": "workspace:*",
+    "@repo/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
+  }
+}

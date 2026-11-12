@@ -1,0 +1,10 @@
+node_modules
+.tanstack
+.fastdrop-build
+dist
+build
+coverage
+*.tsbuildinfo
+pnpm-lock.yaml
+.env
+.env.*

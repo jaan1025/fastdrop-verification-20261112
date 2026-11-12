@@ -1,0 +1,227 @@
+/* Design tokens — raw values.
+ *
+ * Re-themed to template-mono's exact look and feel. Mono ships a real
+ * light + dark theme and apps default to dark, so both blocks are specced.
+ *
+ * Names in the shadcn vocabulary (`--background`, `--primary`, `--border`, …)
+ * come straight from mono. Signal-era additions that the forked primitives /
+ * widgets still reference (`--subtle`, `--surface`, `--commit`, `--success`,
+ * tints, hovers, …) are kept and re-derived from mono's palette so nothing
+ * dangles undefined. See flags in the port report for every derived value.
+ */
+:root {
+  /* ── Radius (mono §3.6 — rounded) ── */
+  --radius: 0.625rem;
+  --radius-icon: 6px; /* opt-in via rounded-[var(--radius-icon)] (icon chips only) */
+  --radius-tree: 8px;
+
+  /* ── Surfaces & text (mono) ── */
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+
+  /* ── Surfaces & text (Signal-only — derived from mono neutrals) ── */
+  --subtle: #737373; /* secondary text / icon — mono muted-foreground */
+  --surface: #fafafa; /* sidebar / table header / read-only field — mono sidebar */
+  --surface-info: #f5f5f5; /* modal info / note card — mono muted */
+  --surface-subtle: rgb(0 0 0 / 0.03); /* 3% black — file-chip surface */
+  --chip-neutral: rgb(0 0 0 / 0.1); /* 10% black — neutral status chip */
+  --track: #f5f5f5; /* segmented-control track — mono muted */
+  --progress-track: #e5e5e5; /* stepper connector / stage-bar empty — mono border */
+  --hover-neutral: rgb(0 0 0 / 0.05); /* menu/list row highlight — 5% black */
+
+  /* ── Brand (mono primary) ── */
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --primary-hover: #0a0a0a; /* Signal-only — primary darkened */
+  --primary-tint: rgb(23 23 23 / 0.1); /* Signal-only — badge / nav-count / hover */
+  --primary-tint-2: rgb(23 23 23 / 0.2); /* Signal-only — sidebar CTA / active */
+
+  /* ── Commit (black) action (Signal-only — matches mono primary) ── */
+  --commit: #171717;
+  --commit-foreground: #fafafa;
+  --commit-hover: #0a0a0a;
+
+  /* ── Secondary / accent (mono) ── */
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+
+  /* ── Positive (mono) ── */
+  --positive: #2ca58d;
+  --positive-foreground: #fafafa;
+
+  /* ── Status — interactive (Signal-only — success derived from mono positive) ── */
+  --success: #2ca58d;
+  --success-foreground: #fafafa;
+  --success-tint: rgb(44 165 141 / 0.1);
+  --warning: #fe9a00; /* mono chart-5 amber */
+  --warning-foreground: #0a0a0a;
+  --warning-tint: rgb(254 154 0 / 0.1);
+
+  /* ── Destructive (mono) + Signal-only hover/tint ── */
+  --destructive: #e7000b;
+  --destructive-foreground: #f5f5f5;
+  --destructive-hover: #c50009; /* Signal-only — destructive darkened */
+  --destructive-tint: rgb(231 0 11 / 0.15); /* Signal-only */
+
+  /* ── Member (Signal-only — derived from mono chart-4 purple) ── */
+  --member: #ad46ff;
+  --member-foreground: #fafafa;
+  --member-tint: rgb(173 70 255 / 0.1);
+
+  /* ── Status — indicators only (Signal-only) ── */
+  --danger-alert: #e7000b; /* notification dots — mono destructive */
+  --success-bright: #2ca58d; /* positive stat numbers — mono positive */
+
+  /* ── Disabled (mono) ── */
+  --disabled: #f5f5f5;
+  --disabled-foreground: #737373;
+
+  /* ── Borders & rings (mono) + Signal-only aliases ── */
+  --border: #e5e5e5;
+  --border-strong: rgb(0 0 0 / 0.15); /* Signal-only — outline-button / dropdown border */
+  --border-token: #e5e5e5; /* Signal-only — library bd-base alias, matches mono border */
+  --input: #e5e5e5;
+  --ring: #a1a1a1;
+
+  /* ── Overlay & elevation (Signal-only) ── */
+  --overlay: rgb(0 0 0 / 0.5);
+  --shadow-card: 0 -4px 18px 0 rgb(0 0 0 / 0.1);
+
+  /* ── Charts (mono) ── */
+  --chart-1: #f54900;
+  --chart-2: #009689;
+  --chart-3: #104e64;
+  --chart-4: #ffb900;
+  --chart-5: #fe9a00;
+
+  /* ── Sidebar (mono) ── */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #a1a1a1;
+
+  /* @airdrop/registration-ui tokens (mono) — tuned for dark UI by default;
+     brand themes can override these centrally. */
+  --reg-eligible: #a8fc60;
+  --reg-danger: #d1157a;
+  --reg-accent: #01aef0;
+  --reg-card-bg: #141414;
+  --reg-border: #282828;
+  --reg-divider: #363636;
+  --reg-muted-foreground: #aab0b6;
+  --reg-bg: #101010;
+  --reg-gradient-start: #01aef0;
+  --reg-gradient-mid: #d42672;
+  --reg-gradient-end: #f8ec1d;
+}
+
+.dark {
+  /* ── Surfaces & text (mono) ── */
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #0a0a0a;
+  --card-foreground: #fafafa;
+  --popover: #0a0a0a;
+  --popover-foreground: #fafafa;
+  --muted: #262626;
+  --muted-foreground: #a1a1a1;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+
+  /* ── Surfaces & text (Signal-only — derived from mono dark neutrals) ── */
+  --subtle: #a1a1a1; /* mono dark muted-foreground */
+  --surface: #171717; /* mono dark sidebar */
+  --surface-info: #262626; /* mono dark muted */
+  --surface-subtle: rgb(255 255 255 / 0.04); /* 4% white — file-chip surface */
+  --chip-neutral: rgb(255 255 255 / 0.1); /* 10% white — neutral status chip */
+  --track: #262626; /* mono dark muted */
+  --progress-track: #262626; /* mono dark border */
+  --hover-neutral: rgb(255 255 255 / 0.06); /* menu/list row highlight — 6% white */
+
+  /* ── Brand (mono dark primary) ── */
+  --primary: #fafafa;
+  --primary-foreground: #171717;
+  --primary-hover: #e5e5e5; /* Signal-only — primary lightened for dark */
+  --primary-tint: rgb(250 250 250 / 0.1); /* Signal-only */
+  --primary-tint-2: rgb(250 250 250 / 0.2); /* Signal-only */
+
+  /* ── Commit action (Signal-only — matches mono dark primary) ── */
+  --commit: #fafafa;
+  --commit-foreground: #171717;
+  --commit-hover: #e5e5e5;
+
+  /* ── Secondary / accent (mono) ── */
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+
+  /* ── Positive (mono dark) ── */
+  --positive: #171717;
+  --positive-foreground: #fafafa;
+
+  /* ── Status — interactive (Signal-only — success = green for legibility on dark) ── */
+  --success: #00bc7d; /* mono dark chart-2 green */
+  --success-foreground: #fafafa;
+  --success-tint: rgb(0 188 125 / 0.15);
+  --warning: #fe9a00; /* mono dark chart-3 amber */
+  --warning-foreground: #0a0a0a;
+  --warning-tint: rgb(254 154 0 / 0.15);
+
+  /* ── Destructive (mono dark) + Signal-only hover/tint ── */
+  --destructive: #82181a;
+  --destructive-foreground: #fb2c36;
+  --destructive-hover: #6a1315; /* Signal-only — destructive darkened */
+  --destructive-tint: rgb(251 44 54 / 0.15); /* Signal-only */
+
+  /* ── Member (Signal-only — mono dark chart-4 purple) ── */
+  --member: #ad46ff;
+  --member-foreground: #fafafa;
+  --member-tint: rgb(173 70 255 / 0.15);
+
+  /* ── Status — indicators only (Signal-only) ── */
+  --danger-alert: #fb2c36; /* mono dark destructive-foreground red */
+  --success-bright: #00bc7d; /* mono dark chart-2 green */
+
+  /* ── Disabled (mono) ── */
+  --disabled: #262626;
+  --disabled-foreground: #a1a1a1;
+
+  /* ── Borders & rings (mono) + Signal-only aliases ── */
+  --border: #262626;
+  --border-strong: rgb(255 255 255 / 0.15); /* Signal-only */
+  --border-token: #262626; /* Signal-only — matches mono dark border */
+  --input: #262626;
+  --ring: #525252;
+
+  /* ── Overlay & elevation (Signal-only) ── */
+  --overlay: rgb(0 0 0 / 0.7);
+  --shadow-card: 0 -4px 18px 0 rgb(0 0 0 / 0.4);
+
+  /* ── Charts (mono dark) ── */
+  --chart-1: #1447e6;
+  --chart-2: #00bc7d;
+  --chart-3: #fe9a00;
+  --chart-4: #ad46ff;
+  --chart-5: #ff2056;
+
+  /* ── Sidebar (mono dark) ── */
+  --sidebar: #171717;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #1447e6;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --sidebar-ring: #525252;
+}

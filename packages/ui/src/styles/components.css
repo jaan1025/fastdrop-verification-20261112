@@ -1,0 +1,41 @@
+/* Reusable component classes — Tailwind v4 `components` cascade layer
+ * (between base and utilities, so utilities always win). Extend here as the
+ * the component layer grows. */
+@layer components {
+  /* Signature hover: L-shaped corner brackets + soft blue fill. */
+  .hover-corners {
+    position: relative;
+    transition: background-color 0.167s ease-in-out;
+  }
+  .hover-corners::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.167s ease-in-out;
+    background:
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary))) left
+        top / 7px 1px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary))) left
+        top / 1px 7px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary)))
+        right top / 7px 1px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary)))
+        right top / 1px 7px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary))) left
+        bottom / 7px 1px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary))) left
+        bottom / 1px 7px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary)))
+        right bottom / 7px 1px no-repeat,
+      linear-gradient(var(--corner-color, var(--primary)), var(--corner-color, var(--primary)))
+        right bottom / 1px 7px no-repeat;
+  }
+  .hover-corners:hover::before {
+    opacity: 1;
+  }
+  .hover-corners:hover {
+    background-color: #e6ecff;
+  }
+}

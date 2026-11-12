@@ -1,0 +1,40 @@
+{
+  "name": "@repo/chain-evm-kit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/chain-evm-kit"
+  },
+  "exports": {
+    "./config": "./src/config/index.ts",
+    "./token": "./src/token/index.ts",
+    "./tos-signer": "./src/react/tos-signer/index.ts",
+    "./transaction": "./src/transaction/index.ts",
+    "./errors": "./src/errors/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./query": "./src/query/index.ts",
+    "./react": "./src/react/index.ts",
+    "./provider": "./src/react/provider/index.ts"
+  },
+  "peerDependencies": {
+    "@reown/appkit": "^1.8.19",
+    "@reown/appkit-adapter-wagmi": "^1.8.19",
+    "@tanstack/react-query": "^5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "viem": "^2",
+    "wagmi": "^2"
+  },
+  "dependencies": {
+    "@repo/acs-client": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@repo/tos-signer-base": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
+  }
+}

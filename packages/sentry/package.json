@@ -1,0 +1,29 @@
+{
+  "name": "@repo/sentry",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/sentry"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts",
+    "./error-boundary": "./src/error-boundary.tsx",
+    "./vite": "./src/vite.ts"
+  },
+  "dependencies": {
+    "@repo/shared": "workspace:*",
+    "@sentry/tanstackstart-react": "^10.63.0"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.2.14",
+    "typescript": "^6.0.2"
+  }
+}

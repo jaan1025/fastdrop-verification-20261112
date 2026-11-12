@@ -1,0 +1,65 @@
+{
+  "name": "@repo/components",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/components"
+  },
+  "peerDependencies": {
+    "@repo/ui": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@date-fns/utc": "^2.1.1",
+    "@repo/acs-client": "workspace:*",
+    "@repo/airdrop-base": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@repo/tos-signer-base": "workspace:*",
+    "@web3icons/react": "^4.1.17",
+    "class-variance-authority": "^0.7.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^1.8.0",
+    "radix-ui": "^1.4.3",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.8.1",
+    "remark-gfm": "^4.0.1",
+    "viem": "^2.52.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
+  },
+  "exports": {
+    "./async-tx-modal": "./src/async-tx-modal/index.ts",
+    "./auth-split-panel": "./src/auth-split-panel.tsx",
+    "./chain-icon": "./src/chain-icon/index.ts",
+    "./confirm-dialog": "./src/confirm-dialog/index.ts",
+    "./copy-button": "./src/copy-button/index.ts",
+    "./copyable-value": "./src/copyable-value/index.ts",
+    "./data-panel": "./src/data-panel/index.ts",
+    "./detail-row": "./src/detail-row/index.ts",
+    "./error-fallback": "./src/error-fallback/index.ts",
+    "./illustrations": "./src/illustrations/index.ts",
+    "./login-dashboard-mock": "./src/login-dashboard-mock.tsx",
+    "./one-shot-toast": "./src/one-shot-toast/index.ts",
+    "./relative-time": "./src/relative-time/index.ts",
+    "./schedule-panel": "./src/schedule-panel/index.ts",
+    "./schedule-ref": "./src/schedule-ref/index.ts",
+    "./step-checklist": "./src/step-checklist/index.ts",
+    "./step-checklist-runner": "./src/step-checklist-runner.tsx",
+    "./step-indicator": "./src/step-indicator/index.ts",
+    "./timestamp-value": "./src/timestamp-value/index.ts",
+    "./token-amount": "./src/token-amount/index.ts",
+    "./tos-dialog": "./src/tos-dialog/index.ts",
+    "./utc-echo": "./src/utc-echo/index.ts",
+    "./vesting-chart": "./src/vesting-chart/index.ts",
+    "./vesting-progress-bar": "./src/vesting-progress-bar/index.ts",
+    "./wallet-address": "./src/wallet-address/index.ts",
+    "./widgets/*": "./src/widgets/*.tsx"
+  }
+}

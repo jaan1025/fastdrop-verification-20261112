@@ -1,0 +1,24 @@
+{
+  "name": "@repo/gtag",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/gtag"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "@types/react": "^19.2.14",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@repo/shared": "workspace:*"
+  }
+}

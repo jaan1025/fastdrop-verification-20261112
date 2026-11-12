@@ -1,0 +1,30 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r --parallel run dev",
+    "lint": "pnpm -r run lint",
+    "check-types": "pnpm -r run check-types",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "overrides": {
+      "viem": "2.52.0",
+      "wagmi": "2.19.5",
+      "@wagmi/core": "2.22.1",
+      "@wagmi/connectors": "6.2.0",
+      "@reown/appkit": "1.8.20",
+      "@reown/appkit-adapter-wagmi": "1.8.20"
+    }
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "vitest": "^4.1.9"
+  }
+}

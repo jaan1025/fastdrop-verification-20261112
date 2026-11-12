@@ -1,0 +1,1893 @@
+{
+  "address": "85F1bj5k85LZxzHM35epKtHD5E11HcYsxLpV8VbyT6od",
+  "metadata": {
+    "name": "merkle_distributor",
+    "version": "0.3.6",
+    "spec": "0.1.0",
+    "description": "A Solana program for distributing tokens according to a Merkle root.",
+    "repository": "https://github.com/CliqueOfficial/clique-lock-svm"
+  },
+  "docs": ["The [merkle_distributor] program."],
+  "instructions": [
+    {
+      "name": "claim",
+      "discriminator": [62, 198, 214, 193, 213, 159, 108, 210],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claimer"
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "from_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "distributor.vault",
+                "account": "MerkleDistributor"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "distributor.mint",
+                "account": "MerkleDistributor"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "to_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "claimer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "distributor.mint",
+                "account": "MerkleDistributor"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19,
+                153, 218, 255, 16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+              ]
+            }
+          }
+        },
+        {
+          "name": "claim_status",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [67, 108, 97, 105, 109, 83, 116, 97, 116, 117, 115]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "account",
+                "path": "claim_root"
+              },
+              {
+                "kind": "arg",
+                "path": "handler"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_root",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [67, 108, 97, 105, 109, 82, 111, 111, 116]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "account",
+                "path": "claim_root.root",
+                "account": "ClaimRoot"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [70, 101, 101, 67, 111, 110, 102, 105, 103]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "account",
+                "path": "claim_root.root",
+                "account": "ClaimRoot"
+              }
+            ]
+          }
+        },
+        {
+          "name": "batch_config",
+          "docs": [
+            "BatchConfig account - validated manually based on configurator index from extra"
+          ]
+        },
+        {
+          "name": "base",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "handler",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "proof",
+          "type": {
+            "vec": {
+              "array": ["u8", 32]
+            }
+          }
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "released",
+          "type": "u64"
+        },
+        {
+          "name": "sig",
+          "type": {
+            "array": ["u8", 65]
+          }
+        },
+        {
+          "name": "extra",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "new_distributor",
+      "docs": [
+        "Creates a new [MerkleDistributor].",
+        "After creating this [MerkleDistributor], the account should be seeded with tokens via its ATA."
+      ],
+      "discriminator": [32, 139, 112, 171, 0, 2, 225, 155],
+      "accounts": [
+        {
+          "name": "base",
+          "docs": ["Base key of the distributor."],
+          "signer": true
+        },
+        {
+          "name": "distributor",
+          "docs": ["[MerkleDistributor]."],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "docs": ["The mint to distribute."]
+        },
+        {
+          "name": "vault",
+          "docs": ["The vault to store the tokens in."]
+        },
+        {
+          "name": "payer",
+          "docs": ["Payer to create the distributor."],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "docs": ["The [System] program."],
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "docs": ["The [Token] program."]
+        }
+      ],
+      "args": [
+        {
+          "name": "signer",
+          "type": {
+            "array": ["u8", 64]
+          }
+        },
+        {
+          "name": "dynamic_recipient",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "discriminator": [211, 22, 221, 251, 74, 121, 193, 47],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_batch_config",
+      "docs": [
+        "Sets the batch configuration for a specific configurator",
+        "This enables hook-based distribution where tokens can be split",
+        "across multiple strategies (e.g., direct transfer + vesting)"
+      ],
+      "discriminator": [159, 100, 146, 210, 63, 238, 234, 184],
+      "accounts": [
+        {
+          "name": "batch_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [66, 97, 116, 99, 104, 67, 111, 110, 102, 105, 103]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "configurator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "configurator",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "SetBatchConfigParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_claim_root",
+      "discriminator": [223, 19, 114, 87, 232, 189, 8, 164],
+      "accounts": [
+        {
+          "name": "claim_root",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [67, 108, 97, 105, 109, 82, 111, 111, 116]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "root"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "root",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "configurators",
+          "type": {
+            "vec": {
+              "array": ["u8", 32]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_fee_per_tier",
+      "discriminator": [223, 120, 179, 76, 14, 42, 236, 84],
+      "accounts": [
+        {
+          "name": "fee_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [70, 101, 101, 67, 111, 110, 102, 105, 103]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "root"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_root",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [67, 108, 97, 105, 109, 82, 111, 111, 116]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "root"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "root",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "rate",
+          "type": "u64"
+        },
+        {
+          "name": "max_fee",
+          "type": "u64"
+        },
+        {
+          "name": "min_fee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_fixed_fee",
+      "discriminator": [238, 14, 137, 181, 156, 157, 55, 27],
+      "accounts": [
+        {
+          "name": "fee_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [70, 101, 101, 67, 111, 110, 102, 105, 103]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "root"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_root",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [67, 108, 97, 105, 109, 82, 111, 111, 116]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "root"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "root",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "fee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_is_dynamic_recipient",
+      "discriminator": [112, 58, 129, 172, 46, 228, 17, 184],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "is_dynamic_recipient",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_mint",
+      "discriminator": [166, 129, 167, 223, 137, 118, 212, 47],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_penalty_config",
+      "docs": [
+        "Sets the penalty configuration for a specific configurator",
+        "This configures the linear penalty parameters for the PenaltyHook"
+      ],
+      "discriminator": [237, 167, 43, 113, 201, 8, 198, 150],
+      "accounts": [
+        {
+          "name": "penalty_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [80, 101, 110, 97, 108, 116, 121, 67, 111, 110, 102, 105, 103]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "configurator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "docs": ["Only the base authority can set penalty config"],
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "configurator",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "begin_time",
+          "type": "i64"
+        },
+        {
+          "name": "end_time",
+          "type": "i64"
+        },
+        {
+          "name": "start_penalty",
+          "type": "u64"
+        },
+        {
+          "name": "end_penalty",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_signer",
+      "discriminator": [127, 120, 252, 184, 97, 4, 88, 68],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "signer",
+          "type": {
+            "array": ["u8", 64]
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_stream_preset",
+      "docs": [
+        "Sets the stream preset for a specific configurator",
+        "This configures the vesting parameters for the LockHook"
+      ],
+      "discriminator": [227, 110, 177, 156, 179, 1, 208, 50],
+      "accounts": [
+        {
+          "name": "stream_preset",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [83, 116, 114, 101, 97, 109, 80, 114, 101, 115, 101, 116]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "configurator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distributor",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "docs": ["Only the base authority can set stream presets"],
+          "signer": true
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "configurator",
+          "type": {
+            "array": ["u8", 32]
+          }
+        },
+        {
+          "name": "params",
+          "type": {
+            "defined": {
+              "name": "SetStreamPresetParams"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_vault",
+      "discriminator": [177, 23, 187, 59, 247, 215, 255, 162],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "vault",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "discriminator": [169, 144, 4, 38, 10, 141, 188, 255],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  77, 101, 114, 107, 108, 101, 68, 105, 115, 116, 114, 105, 98, 117, 116, 111, 114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "base"
+              }
+            ]
+          }
+        },
+        {
+          "name": "base",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "BatchConfig",
+      "discriminator": [98, 99, 199, 65, 53, 247, 5, 106]
+    },
+    {
+      "name": "ClaimRoot",
+      "discriminator": [48, 168, 94, 21, 238, 1, 108, 243]
+    },
+    {
+      "name": "ClaimStatus",
+      "discriminator": [22, 183, 249, 157, 247, 95, 150, 96]
+    },
+    {
+      "name": "FeeConfig",
+      "discriminator": [143, 52, 146, 187, 219, 123, 76, 155]
+    },
+    {
+      "name": "MerkleDistributor",
+      "discriminator": [77, 119, 139, 70, 84, 247, 12, 26]
+    },
+    {
+      "name": "PenaltyConfig",
+      "discriminator": [167, 126, 104, 74, 41, 140, 89, 202]
+    },
+    {
+      "name": "StreamPreset",
+      "discriminator": [120, 25, 191, 59, 192, 235, 68, 19]
+    }
+  ],
+  "events": [
+    {
+      "name": "ClaimedEvent",
+      "discriminator": [144, 172, 209, 86, 144, 87, 84, 115]
+    },
+    {
+      "name": "IsDynamicRecipientUpdatedEvent",
+      "discriminator": [64, 58, 201, 12, 244, 192, 45, 78]
+    },
+    {
+      "name": "LockHookExecutedEvent",
+      "discriminator": [108, 68, 62, 157, 148, 80, 25, 146]
+    },
+    {
+      "name": "MintUpdatedEvent",
+      "discriminator": [154, 37, 101, 87, 208, 175, 169, 0]
+    },
+    {
+      "name": "NewDistributorEvent",
+      "discriminator": [194, 226, 109, 50, 68, 96, 148, 168]
+    },
+    {
+      "name": "PauseEvent",
+      "discriminator": [32, 51, 61, 169, 156, 104, 130, 43]
+    },
+    {
+      "name": "SignerUpdatedEvent",
+      "discriminator": [0, 26, 23, 240, 187, 203, 52, 24]
+    },
+    {
+      "name": "UnpauseEvent",
+      "discriminator": [134, 156, 8, 215, 185, 128, 192, 217]
+    },
+    {
+      "name": "VaultUpdatedEvent",
+      "discriminator": [11, 93, 32, 99, 27, 33, 188, 225]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidHandler",
+      "msg": "Invalid handler."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidProof",
+      "msg": "Invalid Merkle proof."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidSignature",
+      "msg": "Invalid signature."
+    },
+    {
+      "code": 6003,
+      "name": "AirDropAlreadyClaimed",
+      "msg": "Drop already claimed."
+    },
+    {
+      "code": 6004,
+      "name": "Unauthorized",
+      "msg": "Account is not authorized to execute this instruction"
+    },
+    {
+      "code": 6005,
+      "name": "OwnerMismatch",
+      "msg": "Token account owner did not match intended owner"
+    },
+    {
+      "code": 6006,
+      "name": "EnforcePaused",
+      "msg": "Distributor is paused."
+    },
+    {
+      "code": 6007,
+      "name": "DistributorNotActive",
+      "msg": "Distributor is not active."
+    },
+    {
+      "code": 6008,
+      "name": "FeeNotSet",
+      "msg": "Fee not set."
+    },
+    {
+      "code": 6009,
+      "name": "ArithematicOverflow",
+      "msg": "Arthmatic overflow."
+    },
+    {
+      "code": 6010,
+      "name": "InvalidClaimRoot",
+      "msg": "Invalid claim root."
+    },
+    {
+      "code": 6011,
+      "name": "HookDataLengthMismatch",
+      "msg": "Hook data length does not match the number of strategies."
+    },
+    {
+      "code": 6012,
+      "name": "ConsumedAmountMismatch",
+      "msg": "Total consumed amount does not match the expected amount."
+    },
+    {
+      "code": 6013,
+      "name": "InsufficientAllocation",
+      "msg": "Insufficient allocation for fallback hook."
+    },
+    {
+      "code": 6014,
+      "name": "MismatchedAllocation",
+      "msg": "Mismatched allocation"
+    },
+    {
+      "code": 6015,
+      "name": "HookExecutionFailed",
+      "msg": "Hook execution failed."
+    },
+    {
+      "code": 6016,
+      "name": "InvalidBatchConfig",
+      "msg": "Invalid batch configuration."
+    },
+    {
+      "code": 6017,
+      "name": "TooManyStrategies",
+      "msg": "Too many strategies in batch configuration."
+    },
+    {
+      "code": 6018,
+      "name": "InvalidProportion",
+      "msg": "Invalid strategy proportion."
+    },
+    {
+      "code": 6019,
+      "name": "InvalidFallbackHook",
+      "msg": "Invalid fallback hook index."
+    },
+    {
+      "code": 6020,
+      "name": "InsufficientRemainingAccounts",
+      "msg": "Insufficient remaining accounts for hook execution."
+    },
+    {
+      "code": 6021,
+      "name": "InvalidStreamPreset",
+      "msg": "Invalid stream preset account."
+    },
+    {
+      "code": 6022,
+      "name": "InvalidLockProgram",
+      "msg": "Invalid lock program."
+    },
+    {
+      "code": 6023,
+      "name": "InvalidTokenProgram",
+      "msg": "Invalid token program."
+    },
+    {
+      "code": 6024,
+      "name": "InvalidAssociatedTokenProgram",
+      "msg": "Invalid associated token program."
+    },
+    {
+      "code": 6025,
+      "name": "InvalidSystemProgram",
+      "msg": "Invalid system program."
+    },
+    {
+      "code": 6026,
+      "name": "InvalidVault",
+      "msg": "Invalid vault account."
+    },
+    {
+      "code": 6027,
+      "name": "AccountNotMutable",
+      "msg": "Account is not mutable."
+    },
+    {
+      "code": 6028,
+      "name": "InvalidNftMintAddress",
+      "msg": "Invalid NFT mint PDA address."
+    },
+    {
+      "code": 6029,
+      "name": "InvalidConfiguratorIndex",
+      "msg": "Invalid configurator index."
+    },
+    {
+      "code": 6030,
+      "name": "EmptyConfigurators",
+      "msg": "Empty configurators list."
+    },
+    {
+      "code": 6031,
+      "name": "InvalidPenaltyConfig",
+      "msg": "Invalid penalty configuration."
+    },
+    {
+      "code": 6032,
+      "name": "InvalidTimestamp",
+      "msg": "Invalid timestamp."
+    }
+  ],
+  "types": [
+    {
+      "name": "BatchConfig",
+      "docs": [
+        "Batch configuration for distributing tokens through multiple hooks",
+        "PDA seeds: [BatchConfig::SEED, distributor, configurator]",
+        "where configurator is from ClaimRoot.configurator"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fallback_hook",
+            "docs": [
+              "Index of the fallback hook (receives remaining amount after all other hooks)",
+              "Must be a valid index when strategies is not empty"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "strategies",
+            "docs": ["The strategies in this batch configuration"],
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Strategy"
+                }
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "docs": ["Bump seed for PDA"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimRoot",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor of the claim root."],
+            "type": "pubkey"
+          },
+          {
+            "name": "root",
+            "docs": ["The root of the Merkle tree."],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "configurators",
+            "docs": [
+              "The configurators of the Merkle tree. Users can choose which one to use at claim time."
+            ],
+            "type": {
+              "vec": {
+                "array": ["u8", 32]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimStatus",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "claimed",
+            "docs": ["Amount that has been claimed/locked."],
+            "type": "u64"
+          },
+          {
+            "name": "last_slot",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimedEvent",
+      "docs": ["Emitted when tokens are claimed."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "claimant",
+            "docs": ["User that claimed."],
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "docs": ["Amount of tokens to distribute."],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "type": "pubkey"
+          },
+          {
+            "name": "root",
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "fee_mode",
+            "type": {
+              "defined": {
+                "name": "FeeMode"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fixed",
+            "fields": ["u64"]
+          },
+          {
+            "name": "SingleTier",
+            "fields": [
+              {
+                "name": "rate",
+                "type": "u64"
+              },
+              {
+                "name": "max_fee",
+                "type": "u64"
+              },
+              {
+                "name": "min_fee",
+                "type": "u64"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "HookType",
+      "docs": ["Hook types supported by the distributor"],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Transfer"
+          },
+          {
+            "name": "Lock"
+          },
+          {
+            "name": "Penalty"
+          }
+        ]
+      }
+    },
+    {
+      "name": "IsDynamicRecipientUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          },
+          {
+            "name": "is_dynamic_recipient",
+            "docs": ["Whether the recipient is dynamic."],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LockHookExecutedEvent",
+      "docs": ["Emitted when LockHook creates an NFT-bound stream in clique-lock"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account"],
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer",
+            "docs": ["The claimer/recipient who will receive the vested tokens"],
+            "type": "pubkey"
+          },
+          {
+            "name": "stream_id",
+            "docs": ["The stream ID created in clique-lock"],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "nft_mint",
+            "docs": ["The NFT mint address (with Permanent Delegate)"],
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "docs": ["Amount of tokens locked in the stream"],
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "docs": ["Start time of vesting"],
+            "type": "u64"
+          },
+          {
+            "name": "cliff_time",
+            "docs": ["Cliff time of vesting"],
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "docs": ["End time of vesting"],
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MerkleDistributor",
+      "docs": ["State for the account which distributes tokens."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "signer",
+            "docs": ["The tos signer"],
+            "type": {
+              "array": ["u8", 64]
+            }
+          },
+          {
+            "name": "active",
+            "docs": ["Whether the distributor is active."],
+            "type": "bool"
+          },
+          {
+            "name": "vault",
+            "docs": ["The vault to store the tokens in."],
+            "type": "pubkey"
+          },
+          {
+            "name": "base",
+            "docs": ["Base key used to generate the PDA."],
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "docs": ["bumps for the PDA"],
+            "type": "u8"
+          },
+          {
+            "name": "mint",
+            "docs": ["[Mint] of the token to be distributed."],
+            "type": "pubkey"
+          },
+          {
+            "name": "dynamic_recipient",
+            "docs": ["[Dynamic Recipient] of the token to be distributed."],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "docs": ["The mint."],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "NewDistributorEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "base",
+            "docs": ["Base key of the distributor."],
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "docs": ["The mint to distribute."],
+            "type": "pubkey"
+          },
+          {
+            "name": "signer",
+            "docs": ["The signer of the distributor."],
+            "type": {
+              "array": ["u8", 64]
+            }
+          },
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PauseEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PenaltyConfig",
+      "docs": [
+        "Configuration for the linear penalty hook.",
+        "Tokens claimed before `end_time` incur a linear penalty that stays in the vault."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor this config belongs to"],
+            "type": "pubkey"
+          },
+          {
+            "name": "configurator",
+            "docs": ["The configurator identifier"],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "begin_time",
+            "docs": ["Penalty window start (unix timestamp). Claims before this get 100% penalty."],
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "docs": [
+              "Penalty window end (unix timestamp). Claims at or after this get end_penalty_bps penalty."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "start_penalty",
+            "docs": ["Penalty proportion at begin_time (WAD, 1_000_000_000 = 100%)"],
+            "type": "u64"
+          },
+          {
+            "name": "end_penalty",
+            "docs": ["Penalty proportion at end_time (WAD, 1_000_000_000 = 100%)"],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "docs": ["PDA bump"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetBatchConfigParams",
+      "docs": ["Parameters for setting a batch configuration"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fallback_hook",
+            "docs": [
+              "Index of the fallback hook (receives remaining after all other hooks)",
+              "Must be a valid index if strategies is not empty"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "strategies",
+            "docs": ["The strategies for this configuration"],
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Strategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SetStreamPresetParams",
+      "docs": ["Parameters for setting a stream preset"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "start_time",
+            "docs": [
+              "Start time of vesting (unix timestamp)",
+              "If is_fixed_start is false, this is ignored"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cliff_duration",
+            "docs": ["Duration from start to cliff (seconds)"],
+            "type": "u64"
+          },
+          {
+            "name": "vesting_duration",
+            "docs": ["Duration from cliff to end (seconds)"],
+            "type": "u64"
+          },
+          {
+            "name": "start_unlock_bps",
+            "docs": ["Percentage unlocked at start (basis points, 10000 = 100%)"],
+            "type": "u16"
+          },
+          {
+            "name": "cliff_unlock_bps",
+            "docs": ["Percentage unlocked at cliff (basis points, 10000 = 100%)"],
+            "type": "u16"
+          },
+          {
+            "name": "piece_duration",
+            "docs": [
+              "Piece duration encoding for clique-lock vesting schedule",
+              "Format: bytes[23] = mode (0=linear/interval, 1=monthly), bytes[24..32] = interval (big-endian u64)",
+              "Use StreamPreset::encode_linear_piece_duration() or encode_monthly_piece_duration() helpers"
+            ],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "lock_program",
+            "docs": ["The clique-lock program to use (optional)"],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "is_fixed_start",
+            "docs": ["Whether to use fixed start time or current timestamp"],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SignerUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          },
+          {
+            "name": "signer",
+            "docs": ["The signer."],
+            "type": {
+              "array": ["u8", 64]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Strategy",
+      "docs": ["A single strategy in the batch configuration"],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proportion",
+            "docs": [
+              "The proportion of the total amount to allocate to this hook (in WAD, 1e9 = 100%)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "hook_type",
+            "docs": ["The type of hook to execute"],
+            "type": {
+              "defined": {
+                "name": "HookType"
+              }
+            }
+          },
+          {
+            "name": "accounts_count",
+            "docs": ["Number of additional accounts this hook requires from remaining_accounts"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StreamPreset",
+      "docs": [
+        "Stream preset configuration for lock hooks",
+        "PDA seeds: [\"StreamPreset\", distributor, configurator]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor this preset belongs to"],
+            "type": "pubkey"
+          },
+          {
+            "name": "configurator",
+            "docs": ["The configurator (configurationId) this preset is associated with"],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "start_time",
+            "docs": [
+              "Start time of vesting (unix timestamp)",
+              "If is_fixed_start is false, this is ignored and current timestamp is used"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cliff_duration",
+            "docs": ["Duration from start to cliff (seconds)"],
+            "type": "u64"
+          },
+          {
+            "name": "vesting_duration",
+            "docs": ["Duration from cliff to end (seconds)"],
+            "type": "u64"
+          },
+          {
+            "name": "start_unlock_bps",
+            "docs": ["Percentage unlocked at start (basis points, 10000 = 100%)"],
+            "type": "u16"
+          },
+          {
+            "name": "cliff_unlock_bps",
+            "docs": ["Percentage unlocked at cliff (basis points, 10000 = 100%)"],
+            "type": "u16"
+          },
+          {
+            "name": "piece_duration",
+            "docs": [
+              "Piece duration encoding for clique-lock (matches clique-lock's Stream.piece_duration)",
+              "Format: bytes[23] = mode (0=linear/interval, 1=monthly), bytes[24..32] = interval (big-endian u64)"
+            ],
+            "type": {
+              "array": ["u8", 32]
+            }
+          },
+          {
+            "name": "lock_program",
+            "docs": ["The clique-lock program to use"],
+            "type": "pubkey"
+          },
+          {
+            "name": "is_fixed_start",
+            "docs": ["Whether to use fixed start time or current timestamp"],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "docs": ["Bump seed for PDA"],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnpauseEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "docs": ["The distributor account."],
+            "type": "pubkey"
+          },
+          {
+            "name": "vault",
+            "docs": ["The vault."],
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

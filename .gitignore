@@ -1,0 +1,17 @@
+node_modules
+.tanstack
+.fastdrop-build
+dist
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+!.env.development
+
+# Per-developer Claude Code overrides
+**/CLAUDE.local.md
+
+# Fastdrop local delivery artifacts
+.fastdrop/
+.env.local
+.env.*.local

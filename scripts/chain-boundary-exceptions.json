@@ -1,0 +1,42 @@
+[
+  {
+    "path": "packages/airdrop-app-shared/src/app/tos-signer-hosts.tsx",
+    "rule": 2,
+    "reason": "App composition root: mounts both ToS dialog host slots (EvmToSSigner from chain-evm-kit, SolanaToSSigner from chain-solana-kit), each threaded to its own chain provider. Both-chain wiring belongs at the composition root; no chain-SDK dispatch logic here."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/chain/confirm-tx.ts",
+    "rule": 2,
+    "reason": "Thin both-chain tx-finality dispatcher: switches on ConfirmTxParams.chainKind and calls each kit's PURE finality fn (waitForTransactionReceipt from chain-evm-kit / confirm from chain-solana-kit) with read clients passed in \u2014 no SDK hooks mounted. A both-chain dispatcher can't live in either kit (the kits never import each other); app-shared is its home."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/chain/get-transaction-explorer-link.ts",
+    "rule": 2,
+    "reason": "Pure-function chain-dispatch explorer-link facade: classifies once via resolveChainKind, delegates to each kit PURE url builder; dual chain-kit imports are pure fns + catalogs, no SDK hooks."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/chain/supported-chains.ts",
+    "rule": 2,
+    "reason": "Dual catalog: ALL_KNOWN_CHAINS = SUPPORTED_EVM_CHAINS + SUPPORTED_SOLANA_CHAINS union; constants only, no SDK hooks."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/chain/use-chain-clients/use-chain-clients.ts",
+    "rule": 2,
+    "reason": "Chain-dispatch facade for the chain-read-client family: classifies once via resolveChainKind and mounts both -evm/-solana leaves (Rules of Hooks), returning the active chain's clients. Dual chain-package imports name only the EVM public-client TYPE (from chain-evm-kit/transaction, type-only) and the Solana chain resolver (solanaChainFromChainId); no chain-SDK hooks mounted in the facade body."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/claim/hooks/use-distributor-claim-portal/use-distributor-claim-portal.ts",
+    "rule": 2,
+    "reason": "Chain-dispatch claim hook facade: classifies once via resolveChainKind, mounts BOTH -evm/-solana arms unconditionally (Rules of Hooks), returns the active arm. Dual chain-package imports are type-only (HookContracts from airdrop-evm/contracts, Address from chain-solana-kit/config); no chain-SDK hooks/calls in the facade body."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/auth/hooks/use-logout.ts",
+    "rule": 1,
+    "reason": "Dual role reader / sign-out: disconnects both ecosystems (wagmi useDisconnect + chain-solana-kit useDisconnect/useSolana) unconditionally; legal multi-chain composition at the auth boundary."
+  },
+  {
+    "path": "packages/airdrop-app-shared/src/wallet-control/use-dual-wallet-state.ts",
+    "rule": 1,
+    "reason": "Dual-chain wallet-state adapter: mounts useAccount (wagmi) + useAppKit (@reown) + useSolana unconditionally by design (portal has no single expected chain) to feed WalletControl's dual arm; composition-root infra."
+  }
+]

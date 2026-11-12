@@ -1,0 +1,38 @@
+{
+  "name": "@repo/airdrop-solana",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --root ../.. packages/airdrop-solana"
+  },
+  "exports": {
+    "./contracts": "./src/contracts/index.ts",
+    "./query": "./src/query/index.ts",
+    "./react": "./src/react/index.ts",
+    "./keys": "./src/query/keys.ts"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@repo/acs-client": "workspace:*",
+    "@repo/airdrop-base": "workspace:*",
+    "@repo/chain-solana-kit": "workspace:*",
+    "@repo/shared": "workspace:*",
+    "@solana-program/system": "^0.12.2",
+    "@solana-program/token": "^0.13.0",
+    "@solana-program/token-2022": "^0.9.0",
+    "@solana/kit": "^6.9.0",
+    "@wallet-standard/react": "^1.0.3",
+    "viem": "^2.52.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
+  }
+}

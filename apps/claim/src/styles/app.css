@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Self-hosted variable fonts. These define the actual @font-face rules; the
+   :root vars below bind them to the theme contract (@repo/ui/theme maps
+   --font-sans → --font-app-sans, --font-mono → --font-app-mono). */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/* @repo/ui is the single source of truth for tokens + theme mapping. */
+@import "@repo/ui/styles/tokens";
+@import "@repo/ui/styles/theme";
+@import "@repo/ui/styles/typography";
+@import "@repo/ui/styles/components";
+
+/* Markdown viewer styles (legal pages + step descriptions). */
+@import "@repo/markdown/styles.css";
+@import "./fastdrop-brand.css";
+
+@plugin "@tailwindcss/typography";
+
+/* Tailwind v4 only generates utilities for classes in files it is told to scan.
+   Scan this app's src AND every consumed @repo/* package that ships className
+   strings — a class referenced in an un-scanned package silently no-ops
+   (uppercase/tracking-wide/font-mono just disappear). One @source per package
+   whose components this app actually mounts. The claim flow mounts wallet +
+   claim UI from the chain kits and the airdrop-app-shared claim layer, so those
+   are scanned on top of registration's list. */
+@source "../";
+@source "../../../../packages/ui/src";
+@source "../../../../packages/components/src";
+@source "../../../../packages/icons/src";
+@source "../../../../packages/markdown/src";
+@source "../../../../packages/chain-evm-kit/src";
+@source "../../../../packages/chain-solana-kit/src";
+@source "../../../../packages/airdrop-app-shared/src";
+
+:root {
+  --font-app-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-app-mono: "Geist Mono Variable", ui-monospace, monospace;
+}
