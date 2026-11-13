@@ -1,6 +1,7 @@
+import { campaignDynamicRecipient } from "~/lib/campaign-binding"
 import { useRef } from "react"
 import { useMutation } from "@tanstack/react-query"
-import type { PreparedPortalClaim } from "@repo/airdrop-app-shared/claim"
+import { allocationRoot, type PreparedPortalClaim } from "@repo/airdrop-app-shared/claim"
 import { toBigInt } from "@repo/shared/utils"
 
 import { useClaimArm } from "../flow/arms/claim-arm-context"
@@ -12,11 +13,10 @@ export function LiveClaimSession({ children }: ClaimRuntimeProps) {
   const connection = useClaimArm().useConnection()
   const wallet = connection.address
   const ctx = useClaimContext({ address: wallet })
-  const display = claimDisplay("live")
-  const root = readCampaignRoot(import.meta.env.VITE_FASTDROP_ROOT)
-  const batch = import.meta.env.VITE_TARGET_BATCH?.trim()
+  const display = claimDisplay()
+  const batch = ctx.targetBatch
 
-  if (!root || !batch || !ctx.chainId || ctx.targetBatch !== batch || ctx.isError) {
+  if (ctx.isError || (!ctx.chainId && !ctx.isLoading)) {
     return children({ ...display, phase: "unavailable", notice: "The campaign or wallet eligibility could not be verified." })
   }
   if (!wallet) return children({ ...display, phase: "connect", connect: connection.connect })
@@ -31,6 +31,12 @@ export function LiveClaimSession({ children }: ClaimRuntimeProps) {
   if (allocation <= 0n || !ctx.recipientAddress) {
     return children({ ...display, phase: "ineligible", wallet, disconnect: connection.disconnect })
   }
+
+  let root: CampaignRoot | undefined
+  try { root = allocationRoot({ chainKind: ctx.chainKind, allocation: ctx.allocation, addressHandler: ctx.addressHandler, proof: ctx.proof, dynamicRecipient: campaignDynamicRecipient }) }
+  catch { return children({ ...display, phase: "unavailable", notice: "The allocation proof could not be verified." }) }
+  const fixedRoot = readCampaignRoot(import.meta.env.VITE_FASTDROP_ROOT)
+  if (!root || !batch || (fixedRoot && fixedRoot !== root)) return children({ ...display, phase: "unavailable", notice: "The allocation proof could not be verified." })
 
   // Discard any review as soon as the wallet, deployment or allocation changes.
   const scope = JSON.stringify([
@@ -96,7 +102,7 @@ function EligibleClaimSession({ ctx, root, wallet, allocation, disconnect, child
   const publicQuote = reviewed && (({ submit: _submit, ...values }) => values)(reviewed)
 
   return children({
-    ...claimDisplay("live", decimals),
+    ...claimDisplay(decimals),
     phase: "ready",
     busy,
     notice,

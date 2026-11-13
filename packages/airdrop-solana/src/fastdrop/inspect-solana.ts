@@ -1,5 +1,5 @@
-import { address, createSolanaRpc } from "@solana/kit"
-import { clusterFromChainId, retargetSolanaClusterRpc } from "@repo/chain-solana-kit/config"
+import { address, createDefaultRpcTransport, createSolanaRpcFromTransport } from "@solana/kit"
+import { clusterFromChainId } from "@repo/chain-solana-kit/config"
 import { hexToBytes } from "@repo/shared/utils"
 import { LOCK_HOOK_ACCOUNT_COUNT } from "../contracts/distributor/strategies/lock/lock-hook-accounts"
 import { HookType } from "../contracts/distributor/generated/types/hookType"
@@ -12,16 +12,23 @@ function validate(condition: unknown, message: string): asserts condition {
   if (!condition) throw Object.assign(new Error(message), { name: "FastdropValidation" })
 }
 
-export async function inspectSolana(input: { chainId: string; root: `0x${string}`; roles: Record<string, string>; rpcUrl?: string }) {
+export async function inspectSolana(input: { chainId: string; root?: `0x${string}`; roles: Record<string, string>; rpcUrl?: string; signal?: AbortSignal }) {
   const cluster = clusterFromChainId(input.chainId)
   validate(cluster, `The template does not support Solana cluster ${input.chainId}.`)
-  const runtimeRpc = process.env.VITE_SOLANA_RPC_URL
-  const configuredRpc = input.rpcUrl || (runtimeRpc && retargetSolanaClusterRpc(runtimeRpc, cluster))
+  const configuredRpc = input.rpcUrl
   validate(cluster !== "localnet" || configuredRpc, "Set FASTDROP_RPC_URL to the local Solana RPC.")
   const official = cluster === "localnet" ? undefined : `https://api.${cluster}.solana.com`
-  const rpc = createSolanaRpc(configuredRpc || official!)
+  const deadline = input.signal ? AbortSignal.any([input.signal, AbortSignal.timeout(45_000)]) : AbortSignal.timeout(45_000)
+  const createRpc = (url: string) => {
+    const transport = createDefaultRpcTransport({ url })
+    return createSolanaRpcFromTransport((request) => transport({
+      ...request,
+      signal: request.signal ? AbortSignal.any([request.signal, deadline]) : deadline,
+    }))
+  }
+  const rpc = createRpc(configuredRpc || official!)
   if (configuredRpc && official && configuredRpc !== official) {
-    const [actual, expected] = await Promise.all([rpc.getGenesisHash().send(), createSolanaRpc(official).getGenesisHash().send()])
+    const [actual, expected] = await Promise.all([rpc.getGenesisHash().send(), createRpc(official).getGenesisHash().send()])
     validate(actual === expected, "RPC cluster does not match the ACS Solana deployment.")
   }
   const role = address(input.roles.contract!)
@@ -32,6 +39,8 @@ export async function inspectSolana(input: { chainId: string; root: `0x${string}
   validate(distributor, "The Solana distributor account is missing.")
   const [expectedPda] = await getDistributorPDA(distributor.base)
   validate(expectedPda === distributorPda, "The Solana distributor address does not match its on-chain base.")
+  validate(distributor.active, "The Solana distributor is inactive.")
+  if (!input.root) return { token: distributor.mint, strategies: [], dynamicRecipient: distributor.dynamicRecipient, solanaBase: distributor.base }
   const [claimRootPda] = await getClaimRootPDA({ distributor: distributorPda, root: hexToBytes(input.root) })
   const configurators = await resolveConfigurators(rpc, distributorPda, claimRootPda)
   const config = configurators.find(({ index }) => index === 0)

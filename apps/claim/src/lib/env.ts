@@ -28,5 +28,5 @@ export const walletConnectProjectId = (): string => trimmed("VITE_WALLET_CONNECT
 /** Site origin (metadataBase for absolute OG URLs). */
 export const domain = (): string | undefined => trimmed("VITE_DOMAIN")
 
-/** Fastdrop binds a live site to a single reviewed ACS batch. */
+/** Optional legacy CLI override; deployment-scoped sites select the wallet’s last ACS batch. */
 export const targetBatch = (): string | undefined => trimmed("VITE_TARGET_BATCH")

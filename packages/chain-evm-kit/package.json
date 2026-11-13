@@ -16,7 +16,8 @@
     "./utils": "./src/utils/index.ts",
     "./query": "./src/query/index.ts",
     "./react": "./src/react/index.ts",
-    "./provider": "./src/react/provider/index.ts"
+    "./provider": "./src/react/provider/index.ts",
+    "./registry": "./src/config/registry.ts"
   },
   "peerDependencies": {
     "@reown/appkit": "^1.8.19",

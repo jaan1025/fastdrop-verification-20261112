@@ -37,9 +37,6 @@ function ClaimFlow({ session }: { session: ClaimSession }) {
 
   return (
     <div className="container stack w-full max-w-[618px] gap-3 py-8">
-      {session.mode === "demo" ? (
-        <p className="text-center text-sm text-muted-foreground">Design preview · Sample allocations · No wallet transactions</p>
-      ) : null}
       <div className="divide-y rounded-2xl border bg-card text-card-foreground">
         <div className="stack p-6"><ClaimProgress step={step} /></div>
         <section className="stack p-6" aria-busy={session.phase === "checking" || !!session.busy}>
@@ -70,7 +67,6 @@ function StepContent({ title, description, icon, children }: {
 function ConnectStep({ session, onNext }: { session: ClaimSession; onNext: () => void }) {
   const connected = session.phase === "ready" || session.phase === "ineligible"
   const checking = session.phase === "checking"
-  const demo = session.mode === "demo"
 
   return (
     <StepContent title="Connect Wallet" description="Connect your wallet to check your eligibility for rewards.">
@@ -79,7 +75,7 @@ function ConnectStep({ session, onNext }: { session: ClaimSession; onNext: () =>
           <WalletIcon className="shrink-0" aria-hidden="true" />
           <span className="min-w-0 flex-1 truncate text-sm sm:text-base" title={session.wallet}>{session.wallet}</span>
           <ClaimButton size="sm" variant="destructive" type="button" onClick={session.disconnect}>
-            {demo ? "Reset demo wallet" : "Disconnect"}
+            Disconnect
           </ClaimButton>
         </div>
       ) : (
@@ -91,7 +87,7 @@ function ConnectStep({ session, onNext }: { session: ClaimSession; onNext: () =>
         >
           <WalletIcon className="shrink-0" aria-hidden="true" />
           <span className="flex-1 text-sm sm:text-base">
-            {checking ? "Checking eligibility…" : session.phase === "unavailable" ? "Wallet connection unavailable" : demo ? "Connect Demo Wallet" : "Connect Wallet"}
+            {checking ? "Checking eligibility…" : session.phase === "unavailable" ? "Wallet connection unavailable" : "Connect Wallet"}
           </span>
           <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
@@ -119,7 +115,6 @@ function NotEligible({ onBack }: { onBack: () => void }) {
 
 function ClaimAction({ session }: { session: EligibleSession }) {
   const { quote, amount, busy } = session
-  const demo = session.mode === "demo"
   return quote ? (
     <StepContent icon={<EligibleIcon className="size-16" />} title="Review claim" description="Check how your tokens will be distributed before confirming.">
       <dl className="divide-y rounded-xl border px-4">
@@ -129,7 +124,7 @@ function ClaimAction({ session }: { session: EligibleSession }) {
         {quote.forfeitedAmount > 0n ? <AmountRow label="Penalty" value={amount(quote.forfeitedAmount)} /> : null}
       </dl>
       <ClaimButton type="button" className="w-full" loading={busy === "claim"} disabled={!session.canConfirm} onClick={session.confirm}>
-        {demo ? "Simulate Claim" : "Confirm Claim"}
+        Confirm Claim
       </ClaimButton>
       <ClaimButton type="button" variant="outline" className="w-full" disabled={!!busy} onClick={session.clearReview}>Back</ClaimButton>
     </StepContent>
@@ -137,7 +132,7 @@ function ClaimAction({ session }: { session: EligibleSession }) {
     <StepContent icon={<EligibleIcon className="size-16" />} title="You're Eligible!" description="You are eligible for the airdrop!">
       <AllocationAmount session={session} />
       <ClaimButton type="button" className="w-full" loading={busy === "review"} disabled={!session.canReview || !!busy} onClick={session.review}>
-        {demo ? "Review Sample Claim" : "Claim Now"}
+        Claim Now
       </ClaimButton>
       <LockedTokens session={session} />
     </StepContent>
@@ -146,11 +141,10 @@ function ClaimAction({ session }: { session: EligibleSession }) {
 
 function ClaimComplete({ session }: { session: EligibleSession }) {
   const { consumed, receipt, tokenSymbol, amount, busy } = session
-  const demo = session.mode === "demo"
   const claimed = consumed !== undefined && consumed > 0n ? amount(consumed) + " " : ""
   return (
-    <StepContent icon={<EligibleIcon className="size-16" />} title={demo ? "Sample Claim Complete!" : claimed + "Claim Success!"}
-      description={demo ? "The example claim is complete." : `Congratulations, you have claimed your ${tokenSymbol}!`}>
+    <StepContent icon={<EligibleIcon className="size-16" />} title={claimed + "Claim Success!"}
+      description={`Congratulations, you have claimed your ${tokenSymbol}!`}>
       <AllocationAmount session={session} />
       {receipt?.url ? <a className="self-center text-sm underline" href={receipt.url} target="_blank" rel="noreferrer">View transaction</a> : null}
       <LockedTokens session={session} />
@@ -182,7 +176,7 @@ function AmountRow({ label, value }: { label: string; value: string }) {
 }
 
 function LockedTokens({ session }: { session: EligibleSession }) {
-  const { lock, amount, busy, mode } = session
+  const { lock, amount, busy } = session
   if (!lock.position) {
     if (lock.isError) return <p className="text-sm text-muted-foreground" role="alert">The lock position could not be refreshed.</p>
     return lock.isLoading ? <p className="text-sm text-muted-foreground" role="status">Checking locked tokens…</p> : null
@@ -196,7 +190,7 @@ function LockedTokens({ session }: { session: EligibleSession }) {
         <AmountRow label="Fully unlocked by" value={formatClaimDate(lock.position.endTime)} />
       </dl>
       <ClaimButton type="button" variant="outline" className="w-full" loading={busy === "withdraw"} disabled={!lock.canWithdraw || !!busy} onClick={session.withdraw}>
-        {mode === "demo" ? "Simulate Withdrawal" : "Withdraw Unlocked Tokens"}
+        Withdraw Unlocked Tokens
       </ClaimButton>
       {lock.receipt ? (
         <p role="status" className="text-center text-sm">

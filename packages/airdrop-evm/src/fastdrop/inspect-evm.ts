@@ -1,5 +1,5 @@
 import { createPublicClient, http, isAddress, isAddressEqual, zeroAddress, type Address, type Hash, type PublicClient } from "viem"
-import { getSupportedEvmChain, getViemChain } from "@repo/chain-evm-kit/config"
+import { getViemChain } from "@repo/chain-evm-kit/registry"
 import { getActive, getDynamicRecipient, getStrategies, getToken } from "../contracts/distributor/functions/reads"
 import { getPenaltyConfig } from "../contracts/distributor/strategies/linear-penalty-hook/functions"
 import { getStreamPreset } from "../contracts/distributor/strategies/lock-hook/functions"
@@ -8,22 +8,23 @@ function validate(condition: unknown, message: string): asserts condition {
   if (!condition) throw Object.assign(new Error(message), { name: "FastdropValidation" })
 }
 
-export async function inspectEvm(input: { chainId: string; root: Hash; roles: Record<string, string>; rpcUrl?: string }) {
+export async function inspectEvm(input: { chainId: string; root?: Hash; roles: Record<string, string>; rpcUrl: string; signal?: AbortSignal }) {
   const chain = getViemChain(input.chainId)
   validate(chain, `The template does not support EVM chain ${input.chainId}.`)
   const distributor = input.roles.contract
   validate(distributor && isAddress(distributor, { strict: false }), "Invalid EVM distributor role.")
-  const rpcUrl = input.rpcUrl || getSupportedEvmChain(input.chainId)?.rpcUrl
+  const rpcUrl = input.rpcUrl
   // The template's abitype declaration widens viem's inferred account. This
   // public client is created without an account and only used for RPC reads.
-  const client = createPublicClient({ transport: http(rpcUrl, { timeout: 10_000, retryCount: 0 }) }) as unknown as PublicClient
+  const client = createPublicClient({ transport: http(rpcUrl, { timeout: 10_000, retryCount: 0, fetchOptions: { signal: input.signal, redirect: "error" } }) }) as unknown as PublicClient
   validate(String(await client.getChainId()) === input.chainId, "RPC chainId does not match the ACS deployment.")
-  const configuration = await getStrategies(client, { distributor, root: input.root })
   const [active, token, dynamicRecipient] = await Promise.all([
     getActive(client, { distributor }), getToken(client, { distributor }), getDynamicRecipient(client, { distributor }),
   ])
   validate(active, "The EVM distributor is inactive.")
   validate(!isAddressEqual(token, zeroAddress), "The EVM distributor has no token.")
+  if (!input.root) return { token, strategies: [], dynamicRecipient }
+  const configuration = await getStrategies(client, { distributor, root: input.root })
   const matches = (role: string, address: Address) => {
     const candidate = input.roles[role]
     return Boolean(candidate && isAddress(candidate, { strict: false }) && isAddressEqual(candidate, address))

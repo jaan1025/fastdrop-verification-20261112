@@ -3,7 +3,7 @@ import { isEvmAddress } from "@repo/acs-client/model"
 import { evmConsumptionQueryOptions } from "@repo/airdrop-evm/query"
 import { useEvmPublicClient } from "@repo/chain-evm-kit/react"
 
-import { campaignDynamicRecipient } from "../../../../lib/fastdrop-mode"
+import { campaignDynamicRecipient } from "../../../../lib/campaign-binding"
 import type { CampaignRoot } from "../../live-claim"
 import type { ClaimContext } from "../../hooks/use-claim-context"
 import type { ArmConsumption } from "../claim-arm-context"

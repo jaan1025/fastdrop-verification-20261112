@@ -10,7 +10,6 @@ export type ClaimReceipt = { hash: string; url?: string }
 export type ClaimBusy = "review" | "claim" | "withdraw"
 
 interface ClaimDisplay {
-  mode: "demo" | "live"
   tokenName: string
   tokenSymbol: string
   amount: (value: bigint) => string
@@ -51,10 +50,9 @@ export interface ClaimRuntimeProps {
   children: (session: ClaimSession) => ReactNode
 }
 
-export function claimDisplay(mode: ClaimDisplay["mode"], decimals?: number): ClaimDisplay {
+export function claimDisplay(decimals?: number): ClaimDisplay {
   const tokenSymbol = config.token.symbol || "tokens"
   return {
-    mode,
     tokenSymbol,
     tokenName: config.token.name || tokenSymbol,
     busy: null,

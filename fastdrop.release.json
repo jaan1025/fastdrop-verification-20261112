@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "operationId": "699cfd78-40a3-4665-b07e-cfda8cead396",
+  "mode": "live",
+  "siteUrl": "https://jaan1025.github.io/fastdrop-verification-20261112/",
+  "campaign": {
+    "acsUrl": "https://acs-v4.sit.clique-test.tech",
+    "appId": "35c262c7",
+    "deployment": "d2218012-fea3-4c5f-99bc-58738eaabb3b"
+  },
+  "verification": {
+    "chainId": "84532",
+    "distributor": "0x15f1922380b60a35bcc284bfa99bca5549daa9bf",
+    "token": "0x73691532C903B1aEB646B69691822dFbe6740e48",
+    "strategies": [],
+    "dynamicRecipient": false,
+    "scope": {
+      "acsUrl": "https://acs-v4.sit.clique-test.tech",
+      "appId": "35c262c7",
+      "deployment": "d2218012-fea3-4c5f-99bc-58738eaabb3b"
+    }
+  }
+}

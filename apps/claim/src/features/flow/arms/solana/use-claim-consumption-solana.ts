@@ -2,7 +2,7 @@ import { useSolanaReadClients } from "@repo/chain-solana-kit/react"
 import { solanaChainFromChainId } from "@repo/chain-solana-kit/config"
 import { useConsumption } from "@repo/airdrop-solana/react"
 
-import { campaignDynamicRecipient } from "../../../../lib/fastdrop-mode"
+import { campaignDynamicRecipient } from "../../../../lib/campaign-binding"
 import type { CampaignRoot } from "../../live-claim"
 import type { ClaimContext } from "../../hooks/use-claim-context"
 import type { ArmConsumption } from "../claim-arm-context"

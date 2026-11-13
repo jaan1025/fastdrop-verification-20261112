@@ -1,3 +1,4 @@
+import { selectedBatch } from "@repo/airdrop-app-shared/claim"
 import { useMemo } from "react"
 import { resolveChainKind } from "@repo/acs-client/model"
 import { useDeployment, useUserAllocations } from "@repo/acs-client/react"
@@ -5,7 +6,7 @@ import { evmRole, solRole } from "@repo/airdrop-app-shared/lib"
 import { type HookContracts } from "@repo/airdrop-evm/contracts"
 
 import { appId, deployment as deploymentName, targetBatch } from "~/lib/env"
-import { campaignSolanaBase, matchesCampaignDeployment } from "~/lib/fastdrop-mode"
+import { campaignSolanaBase, matchesCampaignDeployment } from "~/lib/campaign-binding"
 
 // EVM / Solana address types are taken off the role accessors' return types —
 // the app cannot import `viem` / `@solana/kit` directly (strict pnpm isolation
@@ -39,7 +40,7 @@ export const useDeploymentDispatch = () => {
 //   • deployment (chainId + roles) via `useDeployment({ name })`
 //   • the chain-typed claim refs (distributor/base/hookContracts/commonLut) from
 //     `roles`, mirroring vesting-portal's `buildPortalClaimChain`
-//   • the exact batch bound at release via `VITE_TARGET_BATCH`
+//   • the connected user’s last ACS batch (or an explicit legacy override)
 //   • the matched allocation row + `recipientAddress`
 //     (`extra.recipient ?? addressHandler`, the value the on-chain probe keys off)
 //
@@ -85,13 +86,13 @@ export const useClaimContext = ({ address }: UseClaimContextInput): ClaimContext
   const chainId = valid ? data?.chainId : undefined
   const roles = valid ? data?.roles : undefined
   const chainKind = resolveChainKind(chainId)
-  const resolvedTargetBatch = targetBatch()
 
   const allocationsQuery = useUserAllocations({
-    address: valid && resolvedTargetBatch ? address : undefined,
+    address: valid ? address : undefined,
     deploymentId: deployment,
   })
 
+  const resolvedTargetBatch = selectedBatch(allocationsQuery.data?.batches, targetBatch())
   const row = resolvedTargetBatch ? allocationsQuery.data?.byBatch[resolvedTargetBatch] : undefined
   const addressHandler = row?.addressHandler
   const recipientAddress = (row?.extra?.recipient as string | undefined) ?? addressHandler
